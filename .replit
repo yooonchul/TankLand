@@ -1,0 +1,16 @@
+compile = "swiftc -o main main.swift TankLand.swift Action.swift Constants.swift Direction.swift GameObject.swift GameObjectType.swift Logger.swift MessageCenter.swift Position.swift RadarResult.swift Tank.swift TankLandActions.swift TankLandDisplay.swift TankLandSupport.swift Mine.swift"
+run = "./main"
+entrypoint = "main.swift"
+
+hidden = ["main"]
+
+[nix]
+channel = "stable-22_11"
+
+[languages]
+
+[languages.swift]
+pattern = "**/*.swift"
+
+[languages.swift.languageServer]
+start = "sourcekit-lsp"
