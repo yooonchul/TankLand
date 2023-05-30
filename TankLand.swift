@@ -25,7 +25,11 @@ class TankLand  {
     }
     
     func addGameObject(gameObject: GameObject){
-	     self.grid[gameObject.position.row][gameObject.position.col] = gameObject 
+    if isGoodIndex(row: gameObject.position.row, col: gameObject.position.col){
+	     self.grid[gameObject.position.row][gameObject.position.col] = gameObject
+    } else {
+      print("ERROR: OUT OF BOUNDS")
+    }
     }
   //changed from grid.count to numberRows/cols
 func randomPos() -> Position {
@@ -49,7 +53,6 @@ func populateTankLand() {
     tanks = findAllTanks()
     allObjects = randomizeGameObjects(gameObjects: allObjects)
     lifeSupport(allObjects)
-    allObjects = randomizeGameObjects(gameObjects: allObjects)
     let messageCenter = MessageCenter()
     var rovers = findAllRovers()
     for obj in rovers{
@@ -61,21 +64,13 @@ func populateTankLand() {
       rovers = findAllRovers()
     }
       tanks.shuffle()
+    print("\n*****COMPUTING PRE ACTIONS*****")
     //radar
       for i in tanks{
         i.computePreActions()
             for j in i.preActions{
               if let radr = j.1 as? RadarAction{
                 runRadar(tank: i, radar: radr)
-              }
-          }
-      }
-    //shieldaction
-      for i in tanks{
-                i.computePreActions()
-            for j in i.preActions{
-              if let shld = j.1 as? ShieldAction{
-                 doSetShieldAction(tank:i, shieldAction:shld)
               }
           }
       }
@@ -97,11 +92,20 @@ func populateTankLand() {
           } 
           }
       }
+      //shieldaction
+      for i in tanks{
+                i.computePreActions()
+            for j in i.preActions{
+              if let shld = j.1 as? ShieldAction{
+                 doSetShieldAction(tank:i, shieldAction:shld)
+              }
+          }
+      }
       tanks.shuffle()
+    print("\n*****COMPUTING POST ACTIONS*****")
     //missle, move, mine 
   var tanksToClear = [Tank]()  
   for i in tanks {
-      print(i)
       i.computePostActions()
       for x in i.postActions {
         
@@ -130,7 +134,11 @@ func populateTankLand() {
   }
       func runGame(){
         populateTankLand()
-        printGrid()
+        tanks = findAllTanks()
+        print("WELCOME TO TANKLAND.\nTURN #0")
+        for i in tanks{
+        logger.printAddTank(i)
+      }
         while !gameOver {
         var command = getUserCommand()
         if command == ""{

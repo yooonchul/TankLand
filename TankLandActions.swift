@@ -84,27 +84,32 @@ if rover.moveInstruct == nil {
 
   func dropMine(tank:Tank, mineAction:MineAction){
     let tankPos = tank.position
-let dropPos = Position(row: tankPos.row + mineAction.dropDirection!.translate().0, col: tankPos.col + mineAction.dropDirection!.translate().1)
+    let dropPos = Position(row: tankPos.row + mineAction.dropDirection!.translate().0, col: tankPos.col + mineAction.dropDirection!.translate().1)
+
+    if !isGoodIndex(row: dropPos.row, col: dropPos.col){
+        logger.printDropMine(tank.id,(mineAction.isRover ? "rover":"mine"),dropPos,false)
+        return
+    }
 
     let cost = mineAction.power + (mineAction.isRover ? Constants.costOfReleasingRover : Constants.costOfReleasingMine)
     if grid[dropPos.row][dropPos.col] != nil{
-      logger.printDropMine(tank.id,(mineAction.isRover ? "rover":"mine"),dropPos,true)
-      return
+        logger.printDropMine(tank.id,(mineAction.isRover ? "rover":"mine"),dropPos,true)
+        return
     }
     if tank.energy < cost{
-      logger.printActionFailEnergy(tank.id,(mineAction.isRover ? "ROVER":"MINE"))
-      return
+        logger.printActionFailEnergy(tank.id,(mineAction.isRover ? "ROVER":"MINE"))
+        return
     }
     
     tank.chargeEnergy(cost)
   
-  addGameObject(gameObject: Mine(owner: tank, id: "M" + threeDigitCenter(Mine.count), isRover: mineAction.isRover, position: dropPos, power: mineAction.power, moveInstruct: mineAction.moveDirection))
+    addGameObject(gameObject: Mine(owner: tank, id: "M" + threeDigitCenter(Mine.count), isRover: mineAction.isRover, position: dropPos, power: mineAction.power, moveInstruct: mineAction.moveDirection))
 
     return
-  }
+}
 
 
-  func fireMissile(tank:Tank, missile:MissileAction){
+func fireMissile(tank:Tank, missile:MissileAction){
     let cost = Constants.costOfLaunchingMissle + Constants.costOfFlyingMissilePerUnitDistance*Int(distanceCalc(tank.position,missile.target)) + missile.power
     guard tank.energy > cost else{
         logger.printActionFailEnergy(tank.id,"LAUNCHING MISSILE")
@@ -112,33 +117,36 @@ let dropPos = Position(row: tankPos.row + mineAction.dropDirection!.translate().
     }
     tank.chargeEnergy(cost)
     var hitGOs = ""
-    for x in max(0, missile.target.row-1)...min(grid.count-1,missile.target.row+1){
-        for y in max(0,missile.target.col-1)...min(grid[0].count-1,missile.target.col+1){
-            if isGoodIndex(row:x,col:y) && grid[x][y] != nil{  
-                var force = missile.power
-                if missile.target != Position(row: x, col: y) {
-                    force /= 4
-                }
-
-                hitGOs = "\(grid[x][y]!.id), "
-                if grid[x][y]!.type == .Tank{
-                    let saveEnergy = grid[x][y]!.energy
-                    let targetTank = grid[x][y]! as! Tank
-                    targetTank.setShield(targetTank.shield > force ? targetTank.shield - force : 0)
-                    force = shieldExtra(targetTank.shield,force)
-                    tank.chargeEnergy(force*Constants.missileStrikeMultiple)
-                    if tank.energy <= 0{
-                        tank.gainEnergy(saveEnergy/Constants.missileEnergyTransfer)
+    if isGoodIndex(row: missile.target.row, col: missile.target.col){
+        for x in max(0, missile.target.row-1)...min(grid.count-1,missile.target.row+1){
+            for y in max(0,missile.target.col-1)...min(grid[0].count-1,missile.target.col+1){
+                if isGoodIndex(row:x,col:y) && grid[x][y] != nil{  
+                    var force = missile.power
+                    if missile.target != Position(row: x, col: y) {
+                        force /= 4
                     }
-                }
-                else{
-                    grid[x][y]!.chargeEnergy(grid[x][y]!.energy)
+
+                    hitGOs = "\(grid[x][y]!.id), "
+                    if grid[x][y]!.type == .Tank{
+                        let saveEnergy = grid[x][y]!.energy
+                        let targetTank = grid[x][y]! as! Tank
+                        targetTank.setShield(targetTank.shield > force ? targetTank.shield - force : 0)
+                        force = shieldExtra(targetTank.shield,force)
+                        tank.chargeEnergy(force*Constants.missileStrikeMultiple)
+                        if tank.energy <= 0{
+                            tank.gainEnergy(saveEnergy/Constants.missileEnergyTransfer)
+                        }
+                    }
+                    else{
+                        grid[x][y]!.chargeEnergy(grid[x][y]!.energy)
+                    }
                 }
             }
         }
     }
     logger.printMissileStrike(tank.id,missile.target,hitGOs)
 }
+
 
 
   func moveTank(tank:Tank,moveAction:MoveAction){

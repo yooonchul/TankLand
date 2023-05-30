@@ -7,16 +7,17 @@ extension TankLand{
       newPosVal.col += magnitude*direction.translate().1
     return newPosVal
 }
-  func isGoodIndex(row: Int, col: Int)->Bool{
-    if 0 <= row && row < grid.count && 0 <= col && col < grid.count{
+  func isGoodIndex(row: Int, col: Int) -> Bool {
+    if 0 <= row && row < grid.count && 0 <= col && col < grid[0].count {
       return true
     }
     return false
-  }
+}
   func randomizeGameObjects(gameObjects: [GameObject]) -> [GameObject]{
    return gameObjects.shuffled()
  }
   func lifeSupport(_ allObjects:[GameObject]){
+    print("LIFESUPPORT CHARGED: Tank - \(Constants.costLifeSupportTank), Mine - \(Constants.costLifeSupportMine), Rover - \(Constants.costLifeSupportRover)")
     for obj in allObjects{
       switch obj.type{
         case .Tank: obj.chargeEnergy(Constants.costLifeSupportTank)

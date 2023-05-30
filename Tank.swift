@@ -71,14 +71,8 @@ class TestTank: Tank{
         if receivedMessage == "Test"{
           print("***MESSAGE SUCCESFULLY RECEIVED***")
         }
-        if radarResults != nil{
-            print("***Radar Results Received***")
-            print("***Radar Results: \(radarResults!)")
-        }
-       
         addPostAction(postAction: MineAction(power: 500, isRover: getRandomBool(), dropDirection: .South, moveDirection: nil))
         addPostAction(postAction: MissileAction(power: 100, target: Position(row:6, col:8)))
         addPostAction(postAction: MoveAction(distance: 1, direction: .North))
-       
     }
 }

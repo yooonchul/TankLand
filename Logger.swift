@@ -59,13 +59,18 @@ print("*************************************************************************
     }
   }
 
-  func printDropMine(_ id:String,_ type:String,_ dropPos:Position,_ fail:Bool,_ energy:Int? = nil){
-    if fail{
-      print("\(turn) \(id) attempted to drop a \(type) at \(dropPos) but failed: SPACE IS OCCUPIED")
-    } else{
-      print("\(turn) \(id) dropped a \(type) at \(dropPos) with \(energy!) energy")
+  func printDropMine(_ id: String, _ type: String, _ dropPos: Position, _ fail: Bool, _ energy: Int? = nil) {
+    if fail {
+        print("\(turn) \(id) attempted to drop a \(type) at \(dropPos) but failed: SPACE IS OCCUPIED")
+    } else {
+        if let energy = energy {
+            print("\(turn) \(id) dropped a \(type) at \(dropPos) with \(energy) energy")
+        } else {
+            print("\(turn) \(id) dropped a \(type) at \(dropPos) but energy is nil")
+        }
     }
-  }
+}
+
 
   func printShield(_ id:String,_ size:Int){
     print("\(turn) SHIELD ADDED...\(id) SET SHIELD TO \(size)")

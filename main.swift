@@ -1,17 +1,13 @@
 //Yoonchul and Jeffrey
-
-
 var grid = TankLand(numberRows: 15, numberCols: 15, tanks: []) 
+grid.runGame()
 
-grid.populateTankLand()
+// while true {
+//     var grid = TankLand(numberRows: 15, numberCols: 15, tanks: []) 
 
-while !grid.gameOver{
-  grid.doTurn()
-}
+//     grid.populateTankLand()
 
-
-
-// init(id: String, position: Position = Position(0, 0), instructions: String = "") {
-//         self.instructions = instructions
-//         super.init(type: .Tank, id: id, position: position, energy: Constants.initialTankEnergy)
+//     while !grid.gameOver {
+//         grid.doTurn()
 //     }
+// }
